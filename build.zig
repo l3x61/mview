@@ -15,6 +15,10 @@ pub fn build(b: *std.Build) void {
         .root_module = exe_mod,
     });
 
+    const options = b.addOptions();
+    options.addOption([]const u8, "exe_name", "vimv");
+    exe.root_module.addOptions("config", options);
+
     // executable.dependencies
     const zglfw = b.dependency("zglfw", .{});
     exe.root_module.addImport("zglfw", zglfw.module("root"));
