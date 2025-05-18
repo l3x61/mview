@@ -14,6 +14,21 @@ pub fn build(b: *std.Build) void {
         .name = "vimv",
         .root_module = exe_mod,
     });
+
+    // executable.dependencies
+    const zglfw = b.dependency("zglfw", .{});
+    exe.root_module.addImport("zglfw", zglfw.module("root"));
+    exe.linkLibrary(zglfw.artifact("glfw"));
+
+    const zopengl = b.dependency("zopengl", .{});
+    exe.root_module.addImport("zopengl", zopengl.module("root"));
+
+    const zgui = b.dependency("zgui", .{
+        .backend = .glfw_opengl3,
+    });
+    exe.root_module.addImport("zgui", zgui.module("root"));
+    exe.linkLibrary(zgui.artifact("imgui"));
+
     b.installArtifact(exe);
 
     // run

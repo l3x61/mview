@@ -3,6 +3,32 @@
     .version = "0.0.1",
     .fingerprint = 0x41231110d2c9b1d0,
     .minimum_zig_version = "0.14.0",
-    .dependencies = .{},
-    .paths = .{ "build.zig", "build.zig.zon", "src", "LICENSE", "README.md" },
+    .dependencies = .{
+        .system_sdk = .{
+            .url = "https://github.com/zig-gamedev/system_sdk/archive/c0dbf11cdc17da5904ea8a17eadc54dee26567ec.tar.gz",
+            .hash = "system_sdk-0.3.0-dev-alwUNnYaaAJAtIdE2fg4NQfDqEKs7QCXy_qYukAOBfmF",
+        },
+
+        .zglfw = .{
+            .url = "https://github.com/zig-gamedev/zglfw/archive/c337cb3d3f984468ea7a386335937a5d555fc024.tar.gz",
+            .hash = "zglfw-0.10.0-dev-zgVDNMacIQA-k7kNSfwUc9Lfzx-bb_wklVm25K-p8Tr7",
+        },
+
+        .zgui = .{
+            .url = "https://github.com/zig-gamedev/zgui/archive/b1c775da1f14d9dbeadc22243a11f7342bf59a51.tar.gz",
+            .hash = "zgui-0.6.0-dev--L6sZC-1aADzgrip50BHiYDaCwSMC04XWK0epNlQD6Dt",
+        },
+
+        .zopengl = .{
+            .url = "https://github.com/zig-gamedev/zopengl/archive/27f5f228bc1f6da4a4f6acaca07d1cc5ad135171.tar.gz",
+            .hash = "zopengl-0.6.0-dev-5-tnz59jCAB6WpFFql6YdVtwBLlOcReCYVOnxQTPD-xC",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "LICENSE",
+        "README.md",
+    },
 }

@@ -1,5 +1,9 @@
 const std = @import("std");
 const log = std.log.scoped(.main);
+const heap = std.heap;
+const assert = std.debug.assert;
+
+const GUI = @import("GUI.zig");
 
 pub const std_options = std.Options{
     .log_level = .debug,
@@ -7,8 +11,15 @@ pub const std_options = std.Options{
 };
 
 pub fn main() !void {
-    log.debug("{s}() started", .{@src().fn_name});
-    defer log.debug("{s}() exited", .{@src().fn_name});
+    log.debug("{s}() entry", .{@src().fn_name});
+    defer log.debug("{s}() exit", .{@src().fn_name});
 
-    std.debug.print("Hello World!\n", .{});
+    var gpa = heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
+    defer assert(gpa.deinit() == .ok);
+
+    var gui = try GUI.init(allocator);
+    defer gui.deinit();
+
+    try gui.run();
 }
