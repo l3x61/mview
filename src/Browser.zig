@@ -110,9 +110,17 @@ pub fn clearEntries(self: *Browser) void {
     self.entries.clearRetainingCapacity();
 }
 
+pub fn selectEntry(self: *Browser, entry: Entry) !void {
+    if (entry.directory()) {
+        try self.changeDir(entry.name);
+    } else {
+        log.info("{s}() {s} selected", .{ @src().fn_name, @tagName(entry.kind) });
+    }
+}
+
 pub fn update(self: *Browser) !void {
     if (self.selected_entry) |entry| {
-        try self.changeDir(entry.name);
+        try self.selectEntry(entry.*);
         self.selected_entry = null;
     }
 
@@ -133,7 +141,7 @@ pub fn update(self: *Browser) !void {
     }
     if (zgui.isKeyPressed(.enter, true)) {
         if (self.cursor) |cursor| {
-            try self.changeDir(self.entries.items[cursor].name);
+            try self.selectEntry(self.entries.items[cursor]);
         }
     }
     if (zgui.isKeyPressed(.back_space, true)) {
