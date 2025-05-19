@@ -15,6 +15,8 @@ const Window = zglfw.Window;
 const zopengl = @import("zopengl");
 const gl = zopengl.bindings;
 
+const Browser = @import("Browser.zig");
+
 const window_title = config.exe_name;
 const window_width = 800;
 const window_height = 450;
@@ -27,10 +29,12 @@ demo: bool = false,
 exit: bool = false,
 window: *Window = undefined,
 ini_file_path: ArrayList(u8) = undefined,
+browser: Browser = undefined,
+font_regular: zgui.Font = undefined,
+font_bold: zgui.Font = undefined,
 
 pub fn init(allocator: Allocator) !GUI {
-    log.debug("{s}() entry", .{@src().fn_name});
-    defer log.debug("{s}() exit", .{@src().fn_name});
+    log.debug("{s}()", .{@src().fn_name});
 
     var self = GUI{};
     self.allocator = allocator;
@@ -70,30 +74,37 @@ pub fn init(allocator: Allocator) !GUI {
 
     zgui.getStyle().scaleAllSizes(scale);
 
-    _ = zgui.io.addFontFromMemory(
-        @embedFile("fonts/GitLabMono.ttf"),
+    self.font_regular = zgui.io.addFontFromMemory(
+        @embedFile("fonts/JetBrainsMonoNL-Regular.ttf"),
+        font_size * scale,
+    );
+
+    self.font_bold = zgui.io.addFontFromMemory(
+        @embedFile("fonts/JetBrainsMonoNL-ExtraBold.ttf"),
         font_size * scale,
     );
 
     zgui.backend.init(self.window);
 
+    self.browser = try Browser.init(allocator, ".");
+
     return self;
 }
 
 pub fn deinit(self: *GUI) void {
-    log.debug("{s}() entry", .{@src().fn_name});
-    defer log.debug("{s}() exit", .{@src().fn_name});
+    log.debug("{s}()", .{@src().fn_name});
 
     zgui.backend.deinit();
     zgui.deinit();
     self.ini_file_path.deinit();
     self.window.destroy();
     zglfw.terminate();
+
+    self.browser.deinit();
 }
 
 pub fn run(self: *GUI) !void {
-    log.debug("{s}() entry", .{@src().fn_name});
-    defer log.debug("{s}() exit", .{@src().fn_name});
+    log.debug("{s}()", .{@src().fn_name});
 
     while (!self.exit) {
         try self.update();
@@ -111,6 +122,8 @@ fn update(self: *GUI) !void {
     if (zgui.isKeyPressed(.d, false)) {
         self.demo = !self.demo;
     }
+
+    try self.browser.update();
 }
 
 fn draw(self: *GUI) !void {
@@ -118,6 +131,8 @@ fn draw(self: *GUI) !void {
 
     const fb_size = self.window.getFramebufferSize();
     zgui.backend.newFrame(@intCast(fb_size[0]), @intCast(fb_size[1]));
+
+    try self.browser.draw(self);
 
     if (self.demo) {
         zgui.showDemoWindow(null);

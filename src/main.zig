@@ -11,8 +11,7 @@ pub const std_options = std.Options{
 };
 
 pub fn main() !void {
-    log.debug("{s}() entry", .{@src().fn_name});
-    defer log.debug("{s}() exit", .{@src().fn_name});
+    log.debug("{s}()", .{@src().fn_name});
 
     var gpa = heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
