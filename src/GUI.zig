@@ -15,7 +15,7 @@ const Window = zglfw.Window;
 const zopengl = @import("zopengl");
 const gl = zopengl.bindings;
 
-const window_title = "vimv";
+const window_title = config.exe_name;
 const window_width = 800;
 const window_height = 450;
 const font_size = 16;

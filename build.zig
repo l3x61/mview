@@ -16,7 +16,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const options = b.addOptions();
-    options.addOption([]const u8, "exe_name", "vimv");
+    options.addOption([:0]const u8, "exe_name", "vimv");
     exe.root_module.addOptions("config", options);
 
     // executable.dependencies
