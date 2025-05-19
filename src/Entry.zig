@@ -18,15 +18,6 @@ pub fn init(allocator: Allocator, dir_entry: fs.Dir.Entry) !Entry {
     return self;
 }
 
-pub fn initX(allocator: Allocator, kind: Kind, name: []const u8) !Entry {
-    var self = Entry{};
-
-    self.kind = kind;
-    self.name = try allocator.dupeZ(u8, name);
-
-    return self;
-}
-
 pub fn deinit(self: *Entry, allocator: Allocator) void {
     allocator.free(self.name);
 }

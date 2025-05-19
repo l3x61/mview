@@ -127,7 +127,7 @@ fn update(self: *GUI) !void {
         self.demo = !self.demo;
     }
 
-    try self.browser.update();
+    try self.browser.update(self);
     try self.viewer.update();
 }
 
