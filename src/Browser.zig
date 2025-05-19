@@ -24,7 +24,7 @@ dir: Dir = undefined,
 entries: ArrayList(Entry) = undefined,
 selected_entry: ?*Entry = null,
 cursor: ?usize = null,
-changed: bool = false,
+cursor_moved: bool = false,
 
 pub fn init(allocator: Allocator, sub_path: [:0]const u8) !Browser {
     log.debug("{s}('{s}') ", .{ @src().fn_name, sub_path });
@@ -73,7 +73,7 @@ pub fn changeDir(self: *Browser, sub_path: [*:0]const u8) !void {
             }
         }
     }
-    self.changed = true;
+    self.cursor_moved = true;
 }
 
 pub fn collectEntries(self: *Browser) !void {
@@ -131,6 +131,7 @@ pub fn update(self: *Browser) !void {
                 (selected.* + entries_len) % (entries_len + 1)
             else
                 entries_len;
+        self.cursor_moved = true;
     }
     if (zgui.isKeyPressed(.down_arrow, true)) {
         self.cursor =
@@ -138,6 +139,7 @@ pub fn update(self: *Browser) !void {
                 (selected.* + 1) % (entries_len + 1)
             else
                 0;
+        self.cursor_moved = true;
     }
     if (zgui.isKeyPressed(.enter, true)) {
         if (self.cursor) |cursor| {
@@ -155,11 +157,11 @@ pub fn draw(self: *Browser, gui: *GUI) !void {
             const is_directory = entry.directory();
             if (is_directory) zgui.pushFont(gui.font_bold);
 
-            if (self.changed) {
+            if (self.cursor_moved) {
                 if (self.cursor) |cursor| {
                     if (cursor == i) {
                         zgui.setScrollHereY(.{});
-                        self.changed = false;
+                        self.cursor_moved = false;
                     }
                 }
             }
