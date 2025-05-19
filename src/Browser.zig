@@ -14,7 +14,7 @@ const zgui = @import("zgui");
 const zopengl = @import("zopengl");
 const gl = zopengl.bindings;
 
-const window_title = "Browser";
+pub const window_title = "Browser";
 
 const Entry = @import("Entry.zig");
 const GUI = @import("GUI.zig");
