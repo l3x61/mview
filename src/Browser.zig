@@ -8,6 +8,7 @@ const mem = std.mem;
 const Dir = fs.Dir;
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
+const posix = std.posix;
 
 const zgui = @import("zgui");
 
@@ -50,10 +51,10 @@ pub fn deinit(self: *Browser) void {
 pub fn changeDir(self: *Browser, sub_path: [*:0]const u8) !void {
     log.info("{s}('{s}')", .{ @src().fn_name, sub_path });
 
-    var buffer: [fs.max_path_bytes]u8 = undefined;
-    const path = try self.dir.realpath(".", &buffer);
-    var iterator = try fs.path.componentIterator(path);
-    const last_path_component = iterator.last();
+    var buffer: [2][fs.max_path_bytes]u8 = undefined;
+    const old_path = try self.dir.realpath(".", &buffer[0]);
+    var it = try fs.path.componentIterator(old_path);
+    const prev_dir = it.last();
 
     var old_dir = self.dir;
     self.dir = self.dir.openDirZ(sub_path, .{ .iterate = true }) catch |err| {
@@ -62,11 +63,14 @@ pub fn changeDir(self: *Browser, sub_path: [*:0]const u8) !void {
     };
     old_dir.close();
 
+    const new_path = try self.dir.realpath(".", &buffer[1]);
+    try posix.chdir(new_path);
+
     self.clearEntries();
     try self.collectEntries();
 
     self.cursor = null;
-    if (last_path_component) |last| {
+    if (prev_dir) |last| {
         for (0.., self.entries.items) |i, entry| {
             if (mem.eql(u8, entry.name, last.name)) {
                 self.cursor = i;

@@ -12,3 +12,11 @@ video image viewer
     - [zopengl](https://github.com/zig-gamedev/zopengl)
 - [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/)
 ### External
+- [MagickWand 7](https://imagemagick.org/script/magick-wand.php)
+
+## ToDo
+- [ ] viewer pan & zoom
+### Maybe
+- [ ] add MIME type detector [libmagic](https://github.com/file/file)
+- [ ] add CJK font [Noto CJK](https://github.com/notofonts/noto-cjk)
+- [ ] bundle MagickWand

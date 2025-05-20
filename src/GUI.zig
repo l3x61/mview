@@ -98,13 +98,14 @@ pub fn init(allocator: Allocator) !GUI {
 pub fn deinit(self: *GUI) void {
     log.debug("{s}()", .{@src().fn_name});
 
+    self.browser.deinit();
+    self.viewer.deinit();
+
     zgui.backend.deinit();
     zgui.deinit();
     self.ini_file_path.deinit();
     self.window.destroy();
     zglfw.terminate();
-
-    self.browser.deinit();
 }
 
 pub fn run(self: *GUI) !void {

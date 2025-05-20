@@ -13,36 +13,57 @@ const gl = zopengl.bindings;
 pub const window_title = "Viewer";
 
 const GUI = @import("GUI.zig");
+const Image = @import("Image.zig");
 
 allocator: Allocator = undefined,
 name: ?[:0]const u8 = undefined,
+image: ?Image = null,
 
 pub fn init(allocator: Allocator) !Viewer {
     log.debug("{s}() ", .{@src().fn_name});
-
     var self = Viewer{};
     self.allocator = allocator;
     return self;
 }
 
-pub fn deinit(_: *Viewer) void {
+pub fn deinit(self: *Viewer) void {
     log.debug("{s}()", .{@src().fn_name});
+    if (self.image) |*image| {
+        image.deinit();
+    }
 }
 
-fn getNameOrAlt(self: Viewer) [:0]const u8 {
-    return if (self.name) |n| n else "N/A";
+fn getStrOrAlt(name: ?[:0]const u8) [:0]const u8 {
+    return if (name) |n| n else "N/A";
 }
 
 pub fn display(self: *Viewer, name: ?[:0]const u8) !void {
-    self.name = name;
-    log.info("{s}() {s}", .{ @src().fn_name, self.getNameOrAlt() });
+    log.info("{s}('{s}') ", .{ @src().fn_name, getStrOrAlt(name) });
+
+    if (self.image) |*image| {
+        image.deinit();
+    }
+    self.image = null;
+
+    if (name) |n| {
+        self.image = try Image.init(self.allocator, n);
+    }
 }
 
 pub fn update(_: *Viewer) !void {}
 
 pub fn draw(self: *Viewer, _: *GUI) !void {
     if (zgui.begin(window_title, .{ .flags = .{} })) {
-        zgui.text("{s}", .{self.getNameOrAlt()});
+        zgui.text("{s}", .{getStrOrAlt(self.name)});
+        if (self.image) |*image| {
+            zgui.image(
+                @ptrFromInt(@as(usize, @intCast(image.texture))),
+                .{
+                    .w = @floatFromInt(image.width),
+                    .h = @floatFromInt(image.height),
+                },
+            );
+        }
     }
     zgui.end();
 }

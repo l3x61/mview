@@ -33,6 +33,10 @@ pub fn build(b: *std.Build) void {
     exe.root_module.addImport("zgui", zgui.module("root"));
     exe.linkLibrary(zgui.artifact("imgui"));
 
+    exe.linkSystemLibrary("MagickWand");
+    exe.addAfterIncludePath(b.path("MagickWand-7"));
+    exe.linkLibC();
+
     b.installArtifact(exe);
 
     // run
