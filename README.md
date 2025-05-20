@@ -15,8 +15,13 @@ video image viewer
 - [MagickWand 7](https://imagemagick.org/script/magick-wand.php)
 
 ## ToDo
-- [ ] viewer pan & zoom
+- [x] viewer pan 
+- [ ] viewer zoom
+- [ ] viewer file info
+- [ ] viewer fit to screen, fit to width, fit to height, etc
+- [ ] viewer controls tooltip
 ### Maybe
+- [ ] viewer rotate
 - [ ] add MIME type detector [libmagic](https://github.com/file/file)
 - [ ] add CJK font [Noto CJK](https://github.com/notofonts/noto-cjk)
 - [ ] bundle MagickWand
