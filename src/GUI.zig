@@ -1,24 +1,22 @@
-const GUI = @This();
-
 const std = @import("std");
-const log = std.log.scoped(.GUI);
 const fs = std.fs;
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 
 const config = @import("config");
-
-const zgui = @import("zgui");
+const window_title = config.exe_name;
 const zglfw = @import("zglfw");
 const Window = zglfw.Window;
-
+const zgui = @import("zgui");
 const zopengl = @import("zopengl");
 const gl = zopengl.bindings;
 
 const Browser = @import("Browser.zig");
 const Viewer = @import("Viewer.zig");
 
-const window_title = config.exe_name;
+const GUI = @This();
+
+const log = std.log.scoped(.GUI);
 const window_width = 800;
 const window_height = 450;
 const font_size = 16;

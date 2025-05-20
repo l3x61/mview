@@ -1,10 +1,9 @@
-const Entry = @This();
-
 const std = @import("std");
 const fs = std.fs;
 const Kind = fs.Dir.Entry.Kind;
-
 const Allocator = std.mem.Allocator;
+
+const Entry = @This();
 
 kind: Kind = undefined,
 name: [:0]u8 = undefined,

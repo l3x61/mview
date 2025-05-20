@@ -1,19 +1,15 @@
-const Viewer = @This();
-
 const std = @import("std");
-const log = std.log.scoped(.Viewer);
 const Allocator = std.mem.Allocator;
-const ArrayList = std.ArrayList;
 
 const zgui = @import("zgui");
 
-const zopengl = @import("zopengl");
-const gl = zopengl.bindings;
-
-pub const window_title = "Viewer";
-
 const GUI = @import("GUI.zig");
 const Image = @import("Image.zig");
+
+const Viewer = @This();
+
+const log = std.log.scoped(.Viewer);
+pub const window_title = "Viewer";
 
 allocator: Allocator = undefined,
 name: ?[:0]const u8 = undefined,

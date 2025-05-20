@@ -1,11 +1,10 @@
-const Image = @This();
 const std = @import("std");
-const log = std.log.scoped(.Image);
 const Allocator = std.mem.Allocator;
 
-const zopengl = @import("zopengl");
-const gl = zopengl.bindings;
+const gl = @import("zopengl").bindings;
 
+const Image = @This();
+const log = std.log.scoped(.Image);
 const c = @cImport({
     @cInclude("MagickWand/MagickWand.h");
 });

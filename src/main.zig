@@ -1,10 +1,10 @@
 const std = @import("std");
-const log = std.log.scoped(.main);
 const heap = std.heap;
 const assert = std.debug.assert;
 
 const GUI = @import("GUI.zig");
 
+const log = std.log.scoped(.main);
 pub const std_options = std.Options{
     .log_level = .debug,
     .logFn = @import("utils/logFn.zig").logFn,

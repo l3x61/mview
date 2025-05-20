@@ -1,24 +1,22 @@
-const Browser = @This();
-
 const std = @import("std");
-const log = std.log.scoped(.Browser);
 const fs = std.fs;
 const sort = std.sort;
 const mem = std.mem;
 const Dir = fs.Dir;
-const Allocator = std.mem.Allocator;
-const ArrayList = std.ArrayList;
 const posix = std.posix;
+const Allocator = mem.Allocator;
+const ArrayList = std.ArrayList;
 
 const zgui = @import("zgui");
-
-const zopengl = @import("zopengl");
-const gl = zopengl.bindings;
-
-pub const window_title = "Browser";
+const gl = @import("zopengl").bindings;
 
 const Entry = @import("Entry.zig");
 const GUI = @import("GUI.zig");
+
+const Browser = @This();
+
+const log = std.log.scoped(.Browser);
+pub const window_title = "Browser";
 
 allocator: Allocator = undefined,
 dir: Dir = undefined,
@@ -102,7 +100,7 @@ fn entryLessThan(_: void, ea: Entry, eb: Entry) bool {
     if (ea_is_dir and !eb_is_dir) return true;
     if (!ea_is_dir and eb_is_dir) return false;
 
-    return std.mem.lessThan(u8, ea.name, eb.name);
+    return mem.lessThan(u8, ea.name, eb.name);
 }
 
 pub fn clearEntries(self: *Browser) void {

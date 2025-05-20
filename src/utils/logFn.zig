@@ -1,4 +1,5 @@
 const std = @import("std");
+
 const Ansi = @import("Ansi.zig");
 
 pub fn logFn(
