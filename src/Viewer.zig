@@ -42,7 +42,10 @@ pub fn display(self: *Viewer, name: ?[:0]const u8) !void {
     self.image = null;
 
     if (name) |n| {
-        self.image = try Image.init(self.allocator, n);
+        self.image = Image.init(self.allocator, n) catch |err| {
+            log.warn("{s}('{s}') {!} ignored", .{ @src().fn_name, n, err });
+            return;
+        };
     }
 }
 
