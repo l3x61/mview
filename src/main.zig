@@ -14,8 +14,8 @@ pub fn main() !void {
     log.debug("{s}()", .{@src().fn_name});
 
     var gpa = heap.GeneralPurposeAllocator(.{}){};
-    const allocator = gpa.allocator();
     defer assert(gpa.deinit() == .ok);
+    const allocator = gpa.allocator();
 
     var gui = try GUI.init(allocator);
     defer gui.deinit();

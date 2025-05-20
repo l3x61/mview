@@ -24,15 +24,15 @@ const gl_major = 4;
 const gl_minor = 0;
 
 allocator: Allocator = undefined,
-demo: bool = false,
-exit: bool = false,
 window: *Window = undefined,
 ini_file_path: ArrayList(u8) = undefined,
-browser: Browser = undefined,
-viewer: Viewer = undefined,
 font_regular: zgui.Font = undefined,
 font_bold: zgui.Font = undefined,
-first: bool = true,
+quit_exe: bool = false,
+dockspace_setup: bool = false,
+browser: Browser = undefined,
+viewer: Viewer = undefined,
+show_demo: bool = false,
 
 pub fn init(allocator: Allocator) !GUI {
     log.debug("{s}()", .{@src().fn_name});
@@ -109,7 +109,7 @@ pub fn deinit(self: *GUI) void {
 pub fn run(self: *GUI) !void {
     log.debug("{s}()", .{@src().fn_name});
 
-    while (!self.exit) {
+    while (!self.quit_exe) {
         try self.update();
         try self.draw();
     }
@@ -119,11 +119,11 @@ fn update(self: *GUI) !void {
     zglfw.pollEvents();
 
     if (self.window.shouldClose() or zgui.isKeyPressed(.escape, false)) {
-        self.exit = true;
+        self.quit_exe = true;
     }
 
     if (zgui.isKeyPressed(.d, false)) {
-        self.demo = !self.demo;
+        self.show_demo = !self.show_demo;
     }
 
     try self.browser.update(self);
@@ -139,7 +139,7 @@ fn draw(self: *GUI) !void {
     const viewport = zgui.getMainViewport();
     const dockspace = zgui.DockSpaceOverViewport(0, viewport, .{ .no_undocking = true, .auto_hide_tab_bar = true });
 
-    if (self.first) {
+    if (!self.dockspace_setup) {
         log.info("{s}() init dockspace", .{@src().fn_name});
 
         zgui.dockBuilderRemoveNode(dockspace);
@@ -154,13 +154,13 @@ fn draw(self: *GUI) !void {
         zgui.dockBuilderDockWindow(Viewer.window_title, node_right);
 
         zgui.dockBuilderFinish(dockspace);
-        self.first = false;
+        self.dockspace_setup = true;
     }
 
     try self.browser.draw(self);
     try self.viewer.draw(self);
 
-    if (self.demo) {
+    if (self.show_demo) {
         zgui.showDemoWindow(null);
     }
 

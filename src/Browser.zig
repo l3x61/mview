@@ -19,7 +19,7 @@ const log = std.log.scoped(.Browser);
 pub const window_title = "Browser";
 
 allocator: Allocator = undefined,
-dir: Dir = undefined,
+working_dir: Dir = undefined,
 entries: ArrayList(Entry) = undefined,
 selected_entry: ?*Entry = null,
 cursor: ?usize = null,
@@ -31,7 +31,7 @@ pub fn init(allocator: Allocator, sub_path: [:0]const u8) !Browser {
     var self = Browser{};
     self.allocator = allocator;
 
-    self.dir = try fs.cwd().openDir(sub_path, .{ .iterate = true });
+    self.working_dir = try fs.cwd().openDir(sub_path, .{ .iterate = true });
 
     self.entries = ArrayList(Entry).init(allocator);
     try self.collectEntries();
@@ -50,18 +50,18 @@ pub fn changeDir(self: *Browser, sub_path: [*:0]const u8) !void {
     log.info("{s}('{s}')", .{ @src().fn_name, sub_path });
 
     var buffer: [2][fs.max_path_bytes]u8 = undefined;
-    const old_path = try self.dir.realpath(".", &buffer[0]);
+    const old_path = try self.working_dir.realpath(".", &buffer[0]);
     var it = try fs.path.componentIterator(old_path);
     const prev_dir = it.last();
 
-    var old_dir = self.dir;
-    self.dir = self.dir.openDirZ(sub_path, .{ .iterate = true }) catch |err| {
+    var old_dir = self.working_dir;
+    self.working_dir = self.working_dir.openDirZ(sub_path, .{ .iterate = true }) catch |err| {
         log.err("{s}('{s}') {!}", .{ @src().fn_name, sub_path, err });
         return;
     };
     old_dir.close();
 
-    const new_path = try self.dir.realpath(".", &buffer[1]);
+    const new_path = try self.working_dir.realpath(".", &buffer[1]);
     try posix.chdir(new_path);
 
     self.clearEntries();
@@ -81,7 +81,7 @@ pub fn changeDir(self: *Browser, sub_path: [*:0]const u8) !void {
 pub fn collectEntries(self: *Browser) !void {
     log.debug("{s}()", .{@src().fn_name});
 
-    var iterator = self.dir.iterate();
+    var iterator = self.working_dir.iterate();
     while (try iterator.next()) |entry| {
         const new_entry = try Entry.init(self.allocator, entry);
         try self.entries.append(new_entry);
@@ -90,17 +90,27 @@ pub fn collectEntries(self: *Browser) !void {
     const parent_dir = try Entry.init(self.allocator, .{ .kind = .directory, .name = ".." });
     try self.entries.insert(0, parent_dir);
 
-    sort.pdq(Entry, self.entries.items, {}, entryLessThan);
+    sort.pdq(Entry, self.entries.items, Order.descending, sortDirAlpha);
 }
 
-fn entryLessThan(_: void, ea: Entry, eb: Entry) bool {
-    const ea_is_dir = ea.directory();
-    const eb_is_dir = eb.directory();
+const Order = enum {
+    ascending,
+    descending,
+};
 
-    if (ea_is_dir and !eb_is_dir) return true;
-    if (!ea_is_dir and eb_is_dir) return false;
+// sort alphabetically, directories first in ascending order
+fn sortDirAlpha(order: Order, a: Entry, b: Entry) bool {
+    const a_is_dir = a.directory();
+    const b_is_dir = b.directory();
 
-    return mem.lessThan(u8, ea.name, eb.name);
+    if (a_is_dir and !b_is_dir) return true;
+    if (!a_is_dir and b_is_dir) return false;
+
+    const less_than = mem.lessThan(u8, a.name, b.name);
+    return switch (order) {
+        .ascending => less_than,
+        .descending => !less_than,
+    };
 }
 
 pub fn clearEntries(self: *Browser) void {
