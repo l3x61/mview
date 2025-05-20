@@ -15,6 +15,7 @@ allocator: Allocator = undefined,
 name: ?[:0]const u8 = undefined,
 image: ?Image = null,
 
+
 pub fn init(allocator: Allocator) !Viewer {
     log.debug("{s}() ", .{@src().fn_name});
     var self = Viewer{};
@@ -58,8 +59,8 @@ pub fn draw(self: *Viewer, _: *GUI) !void {
             zgui.image(
                 @ptrFromInt(@as(usize, @intCast(image.texture))),
                 .{
-                    .w = @floatFromInt(image.width),
-                    .h = @floatFromInt(image.height),
+                    .w = image.width,
+                    .h = image.height,
                 },
             );
         }

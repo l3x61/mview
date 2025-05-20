@@ -90,7 +90,7 @@ pub fn collectEntries(self: *Browser) !void {
     const parent_dir = try Entry.init(self.allocator, .{ .kind = .directory, .name = ".." });
     try self.entries.insert(0, parent_dir);
 
-    sort.pdq(Entry, self.entries.items, Order.descending, sortDirAlpha);
+    sort.pdq(Entry, self.entries.items, Order.ascending, sortDirAlpha);
 }
 
 const Order = enum {

@@ -12,8 +12,8 @@ const c = @cImport({
 allocator: Allocator = undefined,
 name: ?[:0]const u8 = undefined,
 texture: gl.Uint = undefined,
-width: usize = undefined,
-height: usize = undefined,
+width: f32 = undefined,
+height: f32 = undefined,
 
 pub fn init(allocator: Allocator, name: [:0]const u8) !Image {
     log.info("{s}('{s}') ", .{ @src().fn_name, name });
@@ -72,8 +72,8 @@ pub fn init(allocator: Allocator, name: [:0]const u8) !Image {
     var self = Image{};
     self.allocator = allocator;
     self.name = name;
-    self.width = width;
-    self.height = height;
+    self.width = @floatFromInt(width);
+    self.height = @floatFromInt(height);
     self.texture = texture;
     return self;
 }
