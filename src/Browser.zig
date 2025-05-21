@@ -11,7 +11,7 @@ const zgui = @import("zgui");
 const gl = @import("zopengl").bindings;
 
 const Entry = @import("Entry.zig");
-const GUI = @import("GUI.zig");
+const App = @import("App.zig");
 
 const Browser = @This();
 
@@ -122,7 +122,7 @@ pub fn clearEntries(self: *Browser) void {
     self.entries.clearRetainingCapacity();
 }
 
-pub fn selectEntry(self: *Browser, entry: Entry, gui: *GUI) !void {
+pub fn selectEntry(self: *Browser, entry: Entry, gui: *App) !void {
     if (entry.directory()) {
         try gui.viewer.display(null);
         try self.changeDir(entry.name);
@@ -142,7 +142,7 @@ fn entryAtCursor(self: *Browser) ?*Entry {
     return null;
 }
 
-pub fn update(self: *Browser, gui: *GUI) !void {
+pub fn update(self: *Browser, gui: *App) !void {
     if (self.entry_selected) |entry| {
         try self.selectEntry(entry.*, gui);
         self.entry_selected = null;
@@ -178,7 +178,7 @@ pub fn update(self: *Browser, gui: *GUI) !void {
     }
 }
 
-pub fn draw(self: *Browser, gui: *GUI) !void {
+pub fn draw(self: *Browser, gui: *App) !void {
     if (zgui.begin(window_title, .{ .flags = .{} })) {
         for (0.., self.entries.items) |i, *entry| {
             const is_directory = entry.directory();

@@ -14,7 +14,7 @@ const gl = zopengl.bindings;
 const Browser = @import("Browser.zig");
 const Viewer = @import("Viewer.zig");
 
-const GUI = @This();
+const App = @This();
 
 const log = std.log.scoped(.GUI);
 const window_width = 800;
@@ -34,10 +34,10 @@ browser: Browser = undefined,
 viewer: Viewer = undefined,
 show_demo: bool = false,
 
-pub fn init(allocator: Allocator) !GUI {
+pub fn init(allocator: Allocator) !App {
     log.debug("{s}()", .{@src().fn_name});
 
-    var self = GUI{};
+    var self = App{};
     self.allocator = allocator;
     try zglfw.init();
 
@@ -93,7 +93,7 @@ pub fn init(allocator: Allocator) !GUI {
     return self;
 }
 
-pub fn deinit(self: *GUI) void {
+pub fn deinit(self: *App) void {
     log.debug("{s}()", .{@src().fn_name});
 
     self.browser.deinit();
@@ -106,7 +106,7 @@ pub fn deinit(self: *GUI) void {
     zglfw.terminate();
 }
 
-pub fn run(self: *GUI) !void {
+pub fn run(self: *App) !void {
     log.debug("{s}()", .{@src().fn_name});
 
     while (!self.quit_exe) {
@@ -115,7 +115,7 @@ pub fn run(self: *GUI) !void {
     }
 }
 
-fn update(self: *GUI) !void {
+fn update(self: *App) !void {
     zglfw.pollEvents();
 
     if (self.window.shouldClose() or zgui.isKeyPressed(.escape, false)) {
@@ -130,7 +130,7 @@ fn update(self: *GUI) !void {
     try self.viewer.update();
 }
 
-fn draw(self: *GUI) !void {
+fn draw(self: *App) !void {
     gl.clearBufferfv(gl.COLOR, 0, &[_]f32{ 0, 0, 0, 0 });
 
     const fb_size = self.window.getFramebufferSize();
@@ -167,7 +167,7 @@ fn draw(self: *GUI) !void {
     self.render();
 }
 
-fn render(self: *GUI) void {
+fn render(self: *App) void {
     zgui.backend.draw();
     self.window.swapBuffers();
 }

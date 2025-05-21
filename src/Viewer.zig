@@ -4,7 +4,7 @@ const Allocator = std.mem.Allocator;
 
 const zgui = @import("zgui");
 
-const GUI = @import("GUI.zig");
+const App = @import("App.zig");
 const Image = @import("Image.zig");
 
 const Viewer = @This();
@@ -58,7 +58,7 @@ pub fn display(self: *Viewer, name: ?[:0]const u8) !void {
 
 pub fn update(_: *Viewer) !void {}
 
-pub fn draw(self: *Viewer, _: *GUI) !void {
+pub fn draw(self: *Viewer, _: *App) !void {
     if (zgui.begin(window_title, .{ .flags = .{ .no_scrollbar = true } })) {
         if (zgui.isWindowHovered(.{}) and zgui.isMouseDragging(.left, 0.0)) {
             zgui.setMouseCursor(.resize_all);

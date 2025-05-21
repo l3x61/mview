@@ -2,7 +2,7 @@ const std = @import("std");
 const heap = std.heap;
 const assert = std.debug.assert;
 
-const GUI = @import("GUI.zig");
+const App = @import("App.zig");
 
 const log = std.log.scoped(.main);
 pub const std_options = std.Options{
@@ -17,7 +17,7 @@ pub fn main() !void {
     defer assert(gpa.deinit() == .ok);
     const allocator = gpa.allocator();
 
-    var gui = try GUI.init(allocator);
+    var gui = try App.init(allocator);
     defer gui.deinit();
 
     try gui.run();
