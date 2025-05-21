@@ -15,8 +15,7 @@ video image viewer
 - [MagickWand 7](https://imagemagick.org/script/magick-wand.php)
 
 ## ToDo
-- [x] viewer pan 
-- [ ] viewer zoom
+- [X] viewer pan & zoom
 - [ ] viewer file info
 - [ ] viewer fit to screen, fit to width, fit to height, etc
 - [ ] viewer controls tooltip

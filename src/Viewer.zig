@@ -15,8 +15,10 @@ pub const window_title = "Viewer";
 allocator: Allocator = undefined,
 name: ?[:0]const u8 = undefined,
 image: ?Image = null,
-offset: [2]f32 = [_]f32{ 0, 0 },
-scale: f32 = 1.0,
+image_first: bool = false,
+pan: [2]f32 = [_]f32{ 0, 0 },
+zoom: f32 = 1.0,
+zoom_factor: f32 = 1.5, //
 
 pub fn init(allocator: Allocator) !Viewer {
     log.debug("{s}() ", .{@src().fn_name});
@@ -36,7 +38,7 @@ fn getStrOrAlt(name: ?[:0]const u8) [:0]const u8 {
     return if (name) |n| n else "N/A";
 }
 
-pub fn display(self: *Viewer, name: ?[:0]const u8) !void {
+pub fn loadFile(self: *Viewer, name: ?[:0]const u8) !void {
     log.info("{s}('{s}') ", .{ @src().fn_name, getStrOrAlt(name) });
 
     if (self.image) |*image| {
@@ -51,8 +53,8 @@ pub fn display(self: *Viewer, name: ?[:0]const u8) !void {
             log.warn("{s}('{s}') {!} ignored", .{ @src().fn_name, n, err });
             return;
         };
-        self.offset = [_]f32{ 0, 0 };
-        self.scale = 1.0;
+        self.pan = [_]f32{ 0, 0 };
+        self.zoom = 1.0;
     }
 }
 
@@ -60,25 +62,38 @@ pub fn update(_: *Viewer) !void {}
 
 pub fn draw(self: *Viewer, _: *App) !void {
     if (zgui.begin(window_title, .{ .flags = .{ .no_scrollbar = true } })) {
-        if (zgui.isWindowHovered(.{}) and zgui.isMouseDragging(.left, 0.0)) {
-            zgui.setMouseCursor(.resize_all);
-            const delta = zgui.getMouseDragDelta(.left, .{ .lock_threshold = 0 });
-            self.offset[0] += delta[0];
-            self.offset[1] += delta[1];
-            zgui.resetMouseDragDelta(.left);
+        if (zgui.isWindowHovered(.{})) {
+            if (zgui.isMouseDragging(.left, 0.0)) {
+                zgui.setMouseCursor(.resize_all);
+                const delta = zgui.getMouseDragDelta(.left, .{ .lock_threshold = 0 });
+                self.pan[0] += delta[0];
+                self.pan[1] += delta[1];
+                zgui.resetMouseDragDelta(.left);
+            }
+
+            const old_zoom = self.zoom;
+            if (zgui.isKeyPressed(.mouse_x1, true)) self.zoom /= self.zoom_factor;
+            if (zgui.isKeyPressed(.mouse_x2, true)) self.zoom *= self.zoom_factor;
+            self.zoom = std.math.clamp(self.zoom, 0.005, 1000);
+            const window_pos = zgui.getWindowPos();
+            const global_mouse_pos = zgui.getMousePos();
+            const local_mouse_pos = [_]f32{
+                global_mouse_pos[0] - window_pos[0],
+                global_mouse_pos[1] - window_pos[1],
+            };
+            if (self.zoom != old_zoom) {
+                const scale = self.zoom / old_zoom;
+                self.pan[0] = (self.pan[0] - local_mouse_pos[0]) * scale + local_mouse_pos[0];
+                self.pan[1] = (self.pan[1] - local_mouse_pos[1]) * scale + local_mouse_pos[1];
+            }
         }
 
         if (self.image) |*image| {
-            const window_size = zgui.getWindowSize();
             const image_size = [_]f32{
-                image.width * self.scale,
-                image.height * self.scale,
+                image.width * self.zoom,
+                image.height * self.zoom,
             };
-            const image_pos = [_]f32{
-                (window_size[0] - image_size[0]) / 2 + self.offset[0],
-                (window_size[1] - image_size[1]) / 2 + self.offset[1],
-            };
-            zgui.setCursorPos(image_pos);
+            zgui.setCursorPos(self.pan);
             zgui.image(@ptrFromInt(@as(usize, @intCast(image.texture))), .{ .w = image_size[0], .h = image_size[1] });
         }
     }

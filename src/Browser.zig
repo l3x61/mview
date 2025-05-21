@@ -122,12 +122,12 @@ pub fn clearEntries(self: *Browser) void {
     self.entries.clearRetainingCapacity();
 }
 
-pub fn selectEntry(self: *Browser, entry: Entry, gui: *App) !void {
+pub fn selectEntry(self: *Browser, entry: Entry, app: *App) !void {
     if (entry.directory()) {
-        try gui.viewer.display(null);
+        try app.viewer.loadFile(null);
         try self.changeDir(entry.name);
     } else {
-        try gui.viewer.display(entry.name);
+        try app.viewer.loadFile(entry.name);
     }
 }
 
@@ -142,9 +142,9 @@ fn entryAtCursor(self: *Browser) ?*Entry {
     return null;
 }
 
-pub fn update(self: *Browser, gui: *App) !void {
+pub fn update(self: *Browser, app: *App) !void {
     if (self.entry_selected) |entry| {
-        try self.selectEntry(entry.*, gui);
+        try self.selectEntry(entry.*, app);
         self.entry_selected = null;
     }
 
@@ -169,20 +169,20 @@ pub fn update(self: *Browser, gui: *App) !void {
     }
     if (zgui.isKeyPressed(.enter, true)) {
         if (self.cursor) |cursor| {
-            try self.selectEntry(self.entries.items[cursor], gui);
+            try self.selectEntry(self.entries.items[cursor], app);
         }
     }
     if (zgui.isKeyPressed(.back_space, true)) {
-        try gui.viewer.display(null);
+        try app.viewer.loadFile(null);
         try self.changeDir("..");
     }
 }
 
-pub fn draw(self: *Browser, gui: *App) !void {
+pub fn draw(self: *Browser, app: *App) !void {
     if (zgui.begin(window_title, .{ .flags = .{} })) {
         for (0.., self.entries.items) |i, *entry| {
             const is_directory = entry.directory();
-            if (is_directory) zgui.pushFont(gui.font_bold);
+            if (is_directory) zgui.pushFont(app.font_bold);
 
             if (self.cursor_moved) {
                 if (self.cursor) |cursor| {
