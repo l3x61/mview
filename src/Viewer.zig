@@ -54,7 +54,14 @@ pub fn loadFile(self: *Viewer, name: ?[:0]const u8) !void {
             return;
         };
         self.pan = [_]f32{ 0, 0 };
-        self.zoom = 1.0;
+        if (self.image) |image| {
+            const window_size = zgui.getMainViewport().getWorkSize();
+
+            const sx = window_size[0] / image.width;
+            const sy = window_size[1] / image.height;
+
+            self.zoom = @min(sx, sy);
+        }
     }
 }
 
