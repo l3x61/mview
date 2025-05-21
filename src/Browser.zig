@@ -21,7 +21,7 @@ pub const window_title = "Browser";
 allocator: Allocator = undefined,
 working_dir: Dir = undefined,
 entries: ArrayList(Entry) = undefined,
-selected_entry: ?*Entry = null,
+entry_selected: ?*Entry = null,
 cursor: ?usize = null,
 cursor_moved: bool = false,
 
@@ -131,10 +131,21 @@ pub fn selectEntry(self: *Browser, entry: Entry, gui: *GUI) !void {
     }
 }
 
+
+fn entryAtCursor(self: *Browser) ?*Entry {
+    if (self.cursor) |cursor| {
+        const entry = &self.entries.items[cursor];
+        if (!entry.directory()) {
+            return entry;
+        }
+    }
+    return null;
+}
+
 pub fn update(self: *Browser, gui: *GUI) !void {
-    if (self.selected_entry) |entry| {
+    if (self.entry_selected) |entry| {
         try self.selectEntry(entry.*, gui);
-        self.selected_entry = null;
+        self.entry_selected = null;
     }
 
     const entries_len = self.entries.items.len - 1;
@@ -145,6 +156,7 @@ pub fn update(self: *Browser, gui: *GUI) !void {
             else
                 entries_len;
         self.cursor_moved = true;
+        self.entry_selected = self.entryAtCursor();
     }
     if (zgui.isKeyPressed(.down_arrow, true)) {
         self.cursor =
@@ -153,6 +165,7 @@ pub fn update(self: *Browser, gui: *GUI) !void {
             else
                 0;
         self.cursor_moved = true;
+        self.entry_selected = self.entryAtCursor();
     }
     if (zgui.isKeyPressed(.enter, true)) {
         if (self.cursor) |cursor| {
@@ -185,9 +198,7 @@ pub fn draw(self: *Browser, gui: *GUI) !void {
                 .flags = .{ .span_all_columns = true, .allow_double_click = true },
             })) {
                 self.cursor = i;
-                if (zgui.isItemClicked(.left)) {
-                    self.selected_entry = entry;
-                }
+                self.entry_selected = entry;
             }
 
             if (is_directory) zgui.popFont();
