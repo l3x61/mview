@@ -23,6 +23,12 @@ const font_size = 16;
 const gl_major = 4;
 const gl_minor = 0;
 
+var scroll_event = ScrollEvent{ .xoffset = 0, .yoffset = 0 };
+const ScrollEvent = struct {
+    xoffset: f64,
+    yoffset: f64,
+};
+
 allocator: Allocator = undefined,
 window: *Window = undefined,
 ini_file_path: ArrayList(u8) = undefined,
@@ -33,7 +39,6 @@ dockspace_setup: bool = false,
 browser: Browser = undefined,
 viewer: Viewer = undefined,
 show_demo: bool = false,
-
 
 pub fn init(allocator: Allocator) !App {
     log.debug("{s}()", .{@src().fn_name});
@@ -65,13 +70,23 @@ fn windowInit(self: *App) !void {
     zglfw.makeContextCurrent(self.window);
     zglfw.swapInterval(1);
 
+    _ = zglfw.setScrollCallback(self.window, scrollCallback);
 
     try zopengl.loadCoreProfile(zglfw.getProcAddress, gl_major, gl_minor);
 }
 
+fn scrollCallback(_: *Window, xoffset: f64, yoffset: f64) callconv(.c) void {
+    scroll_event.xoffset = xoffset;
+    scroll_event.yoffset = yoffset;
+}
+
+pub fn mouseWheelScrollY() f64 {
+    defer scroll_event = .{ .xoffset = 0, .yoffset = 0 };
+    return scroll_event.yoffset;
+}
+
 fn guiInit(self: *App) !void {
     zgui.init(self.allocator);
-
     const appdata_path = try std.fs.getAppDataDir(self.allocator, config.exe_name);
     try fs.cwd().makePath(appdata_path);
 
@@ -167,7 +182,7 @@ fn draw(self: *App) !void {
     }
 
     try self.browser.draw(self);
-    try self.viewer.draw(self);
+    try self.viewer.draw();
 
     if (self.show_demo) {
         zgui.showDemoWindow(null);

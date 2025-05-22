@@ -18,7 +18,7 @@ image: ?Image = null,
 image_first: bool = false,
 pan: [2]f32 = [_]f32{ 0, 0 },
 zoom: f32 = 1.0,
-zoom_factor: f32 = 1.5, //
+zoom_factor: f32 = 1.5,
 
 pub fn init(allocator: Allocator) !Viewer {
     log.debug("{s}() ", .{@src().fn_name});
@@ -67,7 +67,7 @@ pub fn loadFile(self: *Viewer, name: ?[:0]const u8) !void {
 
 pub fn update(_: *Viewer) !void {}
 
-pub fn draw(self: *Viewer, _: *App) !void {
+pub fn draw(self: *Viewer) !void {
     if (zgui.begin(window_title, .{ .flags = .{ .no_scrollbar = true } })) {
         if (zgui.isWindowHovered(.{})) {
             if (zgui.isMouseDragging(.left, 0.0)) {
@@ -79,8 +79,17 @@ pub fn draw(self: *Viewer, _: *App) !void {
             }
 
             const old_zoom = self.zoom;
-            if (zgui.isKeyPressed(.mouse_x1, true)) self.zoom /= self.zoom_factor;
-            if (zgui.isKeyPressed(.mouse_x2, true)) self.zoom *= self.zoom_factor;
+            // zoom in/out
+            const scroll_y = App.mouseWheelScrollY();
+            if (scroll_y > 0) {
+                self.zoom *= self.zoom_factor;
+            } else if (scroll_y < 0) {
+                self.zoom /= self.zoom_factor;
+            }
+            // reset zoom
+            if (zgui.isKeyPressed(.mouse_middle, false)) {
+                self.zoom = 1.0;
+            }
             self.zoom = std.math.clamp(self.zoom, 0.005, 1000);
             const window_pos = zgui.getWindowPos();
             const global_mouse_pos = zgui.getMousePos();

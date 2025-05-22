@@ -19,6 +19,7 @@ video image viewer
 - [ ] viewer file info
 - [ ] viewer fit to screen, fit to width, fit to height, etc
 - [ ] viewer controls tooltip
+- [ ] config file
 ### Maybe
 - [ ] viewer rotate
 - [ ] add MIME type detector [libmagic](https://github.com/file/file)
