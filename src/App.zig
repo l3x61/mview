@@ -87,10 +87,11 @@ pub fn mouseWheelScrollY() f64 {
 
 fn guiInit(self: *App) !void {
     zgui.init(self.allocator);
+
     const appdata_path = try std.fs.getAppDataDir(self.allocator, config.exe_name);
     try fs.cwd().makePath(appdata_path);
-
     log.info("{s}() config.ini location set to {s}", .{ @src().fn_name, appdata_path });
+
     self.ini_file_path = ArrayList(u8).fromOwnedSlice(self.allocator, appdata_path);
     try self.ini_file_path.appendSlice("/config.ini");
     try self.ini_file_path.append(0);

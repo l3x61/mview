@@ -68,7 +68,7 @@ pub fn loadFile(self: *Viewer, name: ?[:0]const u8) !void {
 pub fn update(_: *Viewer) !void {}
 
 pub fn draw(self: *Viewer) !void {
-    if (zgui.begin(window_title, .{ .flags = .{ .no_scrollbar = true } })) {
+    if (zgui.begin(window_title, .{ .flags = .{ .no_scrollbar = true, .no_scroll_with_mouse = true } })) {
         if (zgui.isWindowHovered(.{})) {
             if (zgui.isMouseDragging(.left, 0.0)) {
                 zgui.setMouseCursor(.resize_all);
