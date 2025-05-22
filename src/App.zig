@@ -34,11 +34,22 @@ browser: Browser = undefined,
 viewer: Viewer = undefined,
 show_demo: bool = false,
 
+
 pub fn init(allocator: Allocator) !App {
     log.debug("{s}()", .{@src().fn_name});
 
     var self = App{};
+
     self.allocator = allocator;
+    try self.windowInit();
+    try self.guiInit();
+    self.browser = try Browser.init(allocator, ".");
+    self.viewer = try Viewer.init(allocator);
+
+    return self;
+}
+
+fn windowInit(self: *App) !void {
     try zglfw.init();
 
     zglfw.windowHint(.context_version_major, gl_major);
@@ -54,15 +65,18 @@ pub fn init(allocator: Allocator) !App {
     zglfw.makeContextCurrent(self.window);
     zglfw.swapInterval(1);
 
+
     try zopengl.loadCoreProfile(zglfw.getProcAddress, gl_major, gl_minor);
+}
 
-    zgui.init(allocator);
+fn guiInit(self: *App) !void {
+    zgui.init(self.allocator);
 
-    const appdata_path = try std.fs.getAppDataDir(allocator, config.exe_name);
+    const appdata_path = try std.fs.getAppDataDir(self.allocator, config.exe_name);
     try fs.cwd().makePath(appdata_path);
 
     log.info("{s}() config.ini location set to {s}", .{ @src().fn_name, appdata_path });
-    self.ini_file_path = ArrayList(u8).fromOwnedSlice(allocator, appdata_path);
+    self.ini_file_path = ArrayList(u8).fromOwnedSlice(self.allocator, appdata_path);
     try self.ini_file_path.appendSlice("/config.ini");
     try self.ini_file_path.append(0);
     const ini_cstr: [:0]u8 = self.ini_file_path.items[0 .. self.ini_file_path.items.len - 1 :0];
@@ -86,11 +100,6 @@ pub fn init(allocator: Allocator) !App {
     );
     zgui.io.setConfigFlags(.{ .dock_enable = true });
     zgui.backend.init(self.window);
-
-    self.browser = try Browser.init(allocator, ".");
-    self.viewer = try Viewer.init(allocator);
-
-    return self;
 }
 
 pub fn deinit(self: *App) void {
