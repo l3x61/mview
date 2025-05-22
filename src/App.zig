@@ -73,6 +73,8 @@ fn windowInit(self: *App) !void {
     _ = zglfw.setScrollCallback(self.window, scrollCallback);
 
     try zopengl.loadCoreProfile(zglfw.getProcAddress, gl_major, gl_minor);
+
+    log.debug("{s}() Max Texture Size: {d}", .{ @src().fn_name, getMaxTextureSize() });
 }
 
 fn scrollCallback(_: *Window, xoffset: f64, yoffset: f64) callconv(.c) void {
@@ -195,4 +197,10 @@ fn draw(self: *App) !void {
 fn render(self: *App) void {
     zgui.backend.draw();
     self.window.swapBuffers();
+}
+
+fn getMaxTextureSize() i32 {
+    var size: i32 = undefined;
+    gl.getIntegerv(gl.MAX_TEXTURE_SIZE, &size);
+    return size;
 }
