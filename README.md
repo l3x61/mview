@@ -21,6 +21,9 @@ A media viewer for Linux under development.
 - [ ] viewer controls tooltip
 - [ ] config file
 - [ ] find a good name
+- [ ] command line options
+- [ ] load media in separate thread
+- [ ] media add video support
 ### Maybe
 - [ ] viewer rotate
 - [ ] add MIME type detector [libmagic](https://github.com/file/file)
