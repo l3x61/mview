@@ -124,13 +124,12 @@ pub fn clearEntries(self: *Browser) void {
 
 pub fn selectEntry(self: *Browser, entry: Entry, app: *App) !void {
     if (entry.directory()) {
-        try app.viewer.loadFile(null);
+        app.viewer.unloadMedia();
         try self.changeDir(entry.name);
     } else {
-        try app.viewer.loadFile(entry.name);
+        try app.viewer.loadMedia(entry.name);
     }
 }
-
 
 fn entryAtCursor(self: *Browser) ?*Entry {
     if (self.cursor) |cursor| {
@@ -173,7 +172,7 @@ pub fn update(self: *Browser, app: *App) !void {
         }
     }
     if (zgui.isKeyPressed(.back_space, true)) {
-        try app.viewer.loadFile(null);
+        app.viewer.unloadMedia();
         try self.changeDir("..");
     }
 }

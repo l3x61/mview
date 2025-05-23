@@ -3,19 +3,16 @@ const math = std.math;
 const Allocator = std.mem.Allocator;
 
 const zgui = @import("zgui");
-
 const App = @import("App.zig");
-const Image = @import("Image.zig");
+const Media = @import("Media.zig");
 
 const Viewer = @This();
-
 const log = std.log.scoped(.Viewer);
+
 pub const window_title = "Viewer";
 
 allocator: Allocator = undefined,
-name: ?[:0]const u8 = undefined,
-image: ?Image = null,
-image_first: bool = false,
+media: ?Media = null,
 pan: [2]f32 = [_]f32{ 0, 0 },
 zoom: f32 = 1.0,
 zoom_factor: f32 = 1.5,
@@ -29,39 +26,41 @@ pub fn init(allocator: Allocator) !Viewer {
 
 pub fn deinit(self: *Viewer) void {
     log.debug("{s}()", .{@src().fn_name});
-    if (self.image) |*image| {
+    if (self.media) |*image| {
         image.deinit();
     }
 }
 
-fn getStrOrAlt(name: ?[:0]const u8) [:0]const u8 {
-    return if (name) |n| n else "N/A";
+/// calls `unloadMedia()`
+pub fn loadMedia(self: *Viewer, name: [:0]const u8) !void {
+    log.info("{s}('{s}')", .{ @src().fn_name, name });
+
+    self.unloadMedia();
+
+    self.media = Media.initImage(self.allocator, name) catch |err| {
+        log.warn("{s}('{s}') {!} ignored", .{ @src().fn_name, name, err });
+        return;
+    };
+
+    self.resetView();
 }
 
-pub fn loadFile(self: *Viewer, name: ?[:0]const u8) !void {
-    log.info("{s}('{s}') ", .{ @src().fn_name, getStrOrAlt(name) });
+pub fn unloadMedia(self: *Viewer) void {
+    log.info("{s}()", .{@src().fn_name});
 
-    if (self.image) |*image| {
-        image.deinit();
-    }
-    self.name = null;
-    self.image = null;
+    if (self.media) |*media| media.deinit();
+    self.media = null;
+}
 
-    if (name) |n| {
-        self.name = n;
-        self.image = Image.init(self.allocator, n) catch |err| {
-            log.warn("{s}('{s}') {!} ignored", .{ @src().fn_name, n, err });
-            return;
-        };
-        self.pan = [_]f32{ 0, 0 };
-        if (self.image) |image| {
-            const window_size = zgui.getMainViewport().getWorkSize();
+pub fn resetView(self: *Viewer) void {
+    self.pan = [_]f32{ 0, 0 };
+    if (self.media) |media| {
+        const window_size = zgui.getMainViewport().getWorkSize();
 
-            const sx = window_size[0] / image.width;
-            const sy = window_size[1] / image.height;
+        const sx: f32 = window_size[0] / @as(f32, @floatFromInt(media.texture.width));
+        const sy: f32 = window_size[1] / @as(f32, @floatFromInt(media.texture.height));
 
-            self.zoom = @min(sx, sy);
-        }
+        self.zoom = @min(sx, sy);
     }
 }
 
@@ -104,14 +103,7 @@ pub fn draw(self: *Viewer) !void {
             }
         }
 
-        if (self.image) |*image| {
-            const image_size = [_]f32{
-                image.width * self.zoom,
-                image.height * self.zoom,
-            };
-            zgui.setCursorPos(self.pan);
-            zgui.image(@ptrFromInt(@as(usize, @intCast(image.texture))), .{ .w = image_size[0], .h = image_size[1] });
-        }
+        if (self.media) |media| media.draw(self.pan, self.zoom);
     }
     zgui.end();
 }
