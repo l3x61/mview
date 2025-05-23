@@ -1,7 +1,7 @@
 .{
     .name = .mview,
     .version = "0.0.1",
-    .fingerprint = 0x41231110d2c9b1d0,
+    .fingerprint = 0x78393073bd85fd0c,
     .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .system_sdk = .{
