@@ -1,5 +1,5 @@
 # vimv
-video image viewer
+A media viewer for Linux under development.
 
 ## Dependencies
 ### Bundled
@@ -25,3 +25,9 @@ video image viewer
 - [ ] add MIME type detector [libmagic](https://github.com/file/file)
 - [ ] add CJK font [Noto CJK](https://github.com/notofonts/noto-cjk)
 - [ ] bundle MagickWand
+
+
+---
+
+## Notes
+- https://github.com/ImageMagick/MagickCache#readme
