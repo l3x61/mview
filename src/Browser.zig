@@ -10,8 +10,9 @@ const ArrayList = std.ArrayList;
 const zgui = @import("zgui");
 const gl = @import("zopengl").bindings;
 
-const Entry = @import("Entry.zig");
 const App = @import("App.zig");
+const Entry = @import("Entry.zig");
+const Magic = @import("Magic.zig");
 
 const Browser = @This();
 
@@ -20,6 +21,7 @@ pub const window_title = "Browser";
 
 allocator: Allocator = undefined,
 working_dir: Dir = undefined,
+magic: Magic = undefined,
 entries: ArrayList(Entry) = undefined,
 entry_selected: ?*Entry = null,
 cursor: ?usize = null,
@@ -32,6 +34,7 @@ pub fn init(allocator: Allocator, sub_path: [:0]const u8) !Browser {
     self.allocator = allocator;
 
     self.working_dir = try fs.cwd().openDir(sub_path, .{ .iterate = true });
+    self.magic = try Magic.init();
 
     self.entries = ArrayList(Entry).init(allocator);
     try self.collectEntries();
@@ -42,6 +45,7 @@ pub fn init(allocator: Allocator, sub_path: [:0]const u8) !Browser {
 pub fn deinit(self: *Browser) void {
     log.debug("{s}()", .{@src().fn_name});
 
+    self.magic.deinit();
     self.clearEntries();
     self.entries.deinit();
 }
@@ -83,7 +87,9 @@ pub fn collectEntries(self: *Browser) !void {
 
     var iterator = self.working_dir.iterate();
     while (try iterator.next()) |entry| {
-        const new_entry = try Entry.init(self.allocator, entry);
+        var new_entry = try Entry.init(self.allocator, entry);
+        // getMimeType() depends on the null terminated name
+        new_entry.mime_type = try self.magic.getMimeType(new_entry.name);
         try self.entries.append(new_entry);
     }
 
@@ -127,7 +133,13 @@ pub fn selectEntry(self: *Browser, entry: Entry, app: *App) !void {
         app.viewer.unloadMedia();
         try self.changeDir(entry.name);
     } else {
-        try app.viewer.loadMedia(entry.name);
+        switch (entry.mime_type) {
+            .image => {
+                app.viewer.unloadMedia();
+                try app.viewer.loadMedia(entry.name);
+            },
+            else => {},
+        }
     }
 }
 
@@ -180,8 +192,33 @@ pub fn update(self: *Browser, app: *App) !void {
 pub fn draw(self: *Browser, app: *App) !void {
     if (zgui.begin(window_title, .{ .flags = .{} })) {
         for (0.., self.entries.items) |i, *entry| {
-            const is_directory = entry.directory();
-            if (is_directory) zgui.pushFont(app.font_bold);
+            if (entry.directory()) {
+                zgui.pushFont(app.font_bold);
+            } else {
+                zgui.pushFont(app.font_regular);
+            }
+
+            if (entry.mime_type == .audio) {
+                zgui.pushStyleColor1u(.{
+                    .idx = .text,
+                    .c = 0xFF39c5cf,
+                });
+            } else if (entry.mime_type == .video) {
+                zgui.pushStyleColor1u(.{
+                    .idx = .text,
+                    .c = 0xFFbe8fff,
+                });
+            } else if (entry.mime_type == .image) {
+                zgui.pushStyleColor1u(.{
+                    .idx = .text,
+                    .c = 0xFF3fb950,
+                });
+            } else {
+                zgui.pushStyleColor1u(.{
+                    .idx = .text,
+                    .c = 0xFFf0f6fc,
+                });
+            }
 
             if (self.cursor_moved) {
                 if (self.cursor) |cursor| {
@@ -200,7 +237,8 @@ pub fn draw(self: *Browser, app: *App) !void {
                 self.entry_selected = entry;
             }
 
-            if (is_directory) zgui.popFont();
+            zgui.popFont();
+            zgui.popStyleColor(.{ .count = 1 });
         }
     }
     zgui.end();

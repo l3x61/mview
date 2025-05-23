@@ -5,6 +5,7 @@ const Allocator = std.mem.Allocator;
 const zgui = @import("zgui");
 const App = @import("App.zig");
 const Media = @import("Media.zig");
+const Entry = @import("Entry.zig");
 
 const Viewer = @This();
 const log = std.log.scoped(.Viewer);
@@ -31,11 +32,8 @@ pub fn deinit(self: *Viewer) void {
     }
 }
 
-/// calls `unloadMedia()`
 pub fn loadMedia(self: *Viewer, name: [:0]const u8) !void {
     log.info("{s}('{s}')", .{ @src().fn_name, name });
-
-    self.unloadMedia();
 
     self.media = Media.initImage(self.allocator, name) catch |err| {
         log.warn("{s}('{s}') {!} ignored", .{ @src().fn_name, name, err });
@@ -46,7 +44,7 @@ pub fn loadMedia(self: *Viewer, name: [:0]const u8) !void {
 }
 
 pub fn unloadMedia(self: *Viewer) void {
-    log.info("{s}()", .{@src().fn_name});
+    log.debug("{s}()", .{@src().fn_name});
 
     if (self.media) |*media| media.deinit();
     self.media = null;

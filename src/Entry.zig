@@ -3,10 +3,13 @@ const fs = std.fs;
 const Kind = fs.Dir.Entry.Kind;
 const Allocator = std.mem.Allocator;
 
+const MimeType = @import("Magic.zig").MimeType;
+
 const Entry = @This();
 
 kind: Kind = undefined,
 name: [:0]u8 = undefined,
+mime_type: MimeType = undefined,
 
 pub fn init(allocator: Allocator, dir_entry: fs.Dir.Entry) !Entry {
     var self = Entry{};

@@ -19,7 +19,7 @@ const App = @This();
 const log = std.log.scoped(.GUI);
 const window_width = 800;
 const window_height = 450;
-const font_size = 16;
+const font_size = 18;
 const gl_major = 4;
 const gl_minor = 0;
 
@@ -167,7 +167,7 @@ fn draw(self: *App) !void {
     const dockspace = zgui.DockSpaceOverViewport(0, viewport, .{ .no_undocking = true, .auto_hide_tab_bar = true });
 
     if (!self.dockspace_setup) {
-        log.info("{s}() init dockspace", .{@src().fn_name});
+        log.debug("{s}() init dockspace", .{@src().fn_name});
 
         zgui.dockBuilderRemoveNode(dockspace);
         _ = zgui.dockBuilderAddNode(dockspace, .{ .dock_space = true, .no_undocking = true });

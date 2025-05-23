@@ -16,17 +16,18 @@ A media viewer for Linux under development.
 
 ## ToDo
 - [X] viewer pan & zoom
+- [X] add MIME type detector [libmagic](https://github.com/file/file)
 - [ ] viewer file info
 - [ ] viewer fit to screen, fit to width, fit to height, etc
 - [ ] viewer controls tooltip
 - [ ] config file
-- [ ] find a good name
 - [ ] command line options
 - [ ] load media in separate thread
 - [ ] media add video support
+- [ ] browser toggle dotfiles visibility
+
 ### Maybe
 - [ ] viewer rotate
-- [ ] add MIME type detector [libmagic](https://github.com/file/file)
 - [ ] add CJK font [Noto CJK](https://github.com/notofonts/noto-cjk)
 - [ ] bundle MagickWand
 
