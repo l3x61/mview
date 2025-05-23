@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const exe_name = "mview";
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
@@ -11,12 +13,12 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     const exe = b.addExecutable(.{
-        .name = "vimv",
+        .name = exe_name,
         .root_module = exe_mod,
     });
 
     const options = b.addOptions();
-    options.addOption([:0]const u8, "exe_name", "vimv");
+    options.addOption([:0]const u8, "exe_name", exe_name);
     exe.root_module.addOptions("config", options);
 
     // executable.dependencies

@@ -1,4 +1,4 @@
-# vimv
+# mview
 A media viewer for Linux under development.
 
 ## Dependencies
@@ -20,6 +20,7 @@ A media viewer for Linux under development.
 - [ ] viewer fit to screen, fit to width, fit to height, etc
 - [ ] viewer controls tooltip
 - [ ] config file
+- [ ] find a good name
 ### Maybe
 - [ ] viewer rotate
 - [ ] add MIME type detector [libmagic](https://github.com/file/file)

@@ -1,5 +1,5 @@
 .{
-    .name = .vimv,
+    .name = .mview,
     .version = "0.0.1",
     .fingerprint = 0x41231110d2c9b1d0,
     .minimum_zig_version = "0.14.0",
