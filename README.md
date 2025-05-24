@@ -19,7 +19,7 @@ A media viewer for Linux under development.
 - [X] viewer pan & zoom
 - [X] add MIME type detector 
 - [X] fullscreen toggle
-- [ ] profile loading times
+- [X] profile loading times
 - [ ] load media in separate thread
 - [ ] viewer file info
 - [ ] viewer fit to screen, fit to width, fit to height, etc

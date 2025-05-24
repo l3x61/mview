@@ -1,11 +1,14 @@
 const std = @import("std");
 const math = std.math;
+const time = std.time;
+const Timer = time.Timer;
 const Allocator = std.mem.Allocator;
 
 const zgui = @import("zgui");
 const App = @import("App.zig");
 const Media = @import("Media.zig");
 const Entry = @import("Entry.zig");
+
 
 const Viewer = @This();
 const log = std.log.scoped(.Viewer);
@@ -35,10 +38,13 @@ pub fn deinit(self: *Viewer) void {
 pub fn loadMedia(self: *Viewer, name: [:0]const u8) !void {
     log.info("{s}('{s}')", .{ @src().fn_name, name });
 
+    var timer = try Timer.start();
     self.media = Media.initImage(self.allocator, name) catch |err| {
         log.warn("{s}('{s}') {!} ignored", .{ @src().fn_name, name, err });
         return;
     };
+    const ns = timer.read();
+    log.info("{s}() took {d}ms", .{ @src().fn_name, ns / time.ns_per_ms});
 
     self.resetView();
 }
