@@ -151,7 +151,7 @@ pub fn run(self: *App) !void {
 fn update(self: *App) !void {
     zglfw.pollEvents();
 
-    if (self.window.shouldClose() or zgui.isKeyPressed(.escape, false)) {
+    if (self.window.shouldClose() or zgui.isKeyPressed(.escape, false) or zgui.isKeyPressed(.q, false)) {
         self.quit_exe = true;
     }
 
