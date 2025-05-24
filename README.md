@@ -19,6 +19,7 @@ A media viewer for Linux under development.
 - [X] viewer pan & zoom
 - [X] add MIME type detector 
 - [X] fullscreen toggle
+- [ ] profile loading times
 - [ ] load media in separate thread
 - [ ] viewer file info
 - [ ] viewer fit to screen, fit to width, fit to height, etc
@@ -33,6 +34,7 @@ A media viewer for Linux under development.
 - [ ] add CJK font [Noto CJK](https://github.com/notofonts/noto-cjk)
 - [ ] bundle MagickWand
 - [ ] bundle libmagic
+- [ ] switch to SDL3
 
 
 
