@@ -18,13 +18,13 @@ A media viewer for Linux under development.
 ## ToDo
 - [X] viewer pan & zoom
 - [X] add MIME type detector 
-- [ ] fullscreen toggle
+- [X] fullscreen toggle
+- [ ] load media in separate thread
 - [ ] viewer file info
 - [ ] viewer fit to screen, fit to width, fit to height, etc
 - [ ] viewer controls tooltip
 - [ ] config file
 - [ ] command line options
-- [ ] load media in separate thread
 - [ ] media add video support
 - [ ] browser toggle dotfiles visibility
 

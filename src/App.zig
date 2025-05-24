@@ -34,11 +34,17 @@ window: *Window = undefined,
 ini_file_path: ArrayList(u8) = undefined,
 font_regular: zgui.Font = undefined,
 font_bold: zgui.Font = undefined,
-quit_exe: bool = false,
-dockspace_setup: bool = false,
 browser: Browser = undefined,
 viewer: Viewer = undefined,
 show_demo: bool = false,
+quit_exe: bool = false,
+dockspace_setup: bool = false,
+fullscreen: bool = false,
+pos_x: c_int = undefined,
+pos_y: c_int = undefined,
+width: c_int = undefined,
+height: c_int = undefined,
+refresh_rate: c_int = undefined,
 
 pub fn init(allocator: Allocator) !App {
     log.debug("{s}()", .{@src().fn_name});
@@ -149,6 +155,11 @@ fn update(self: *App) !void {
         self.quit_exe = true;
     }
 
+    if (zgui.isKeyPressed(.f, false)) {
+        self.fullscreen = !self.fullscreen;
+        try self.toggleFullscreen();
+    }
+
     if (zgui.isKeyPressed(.d, false)) {
         self.show_demo = !self.show_demo;
     }
@@ -203,4 +214,25 @@ fn getMaxTextureSize() i32 {
     var size: i32 = undefined;
     gl.getIntegerv(gl.MAX_TEXTURE_SIZE, &size);
     return size;
+}
+
+fn toggleFullscreen(self: *App) !void {
+    log.debug("{s}() fullscreen = {}", .{ @src().fn_name, self.fullscreen });
+    // https://github.com/glfw/glfw/issues/1699
+    const monitor = zglfw.getPrimaryMonitor() orelse {
+        log.err("{s}() could not get primary monitor", .{@src().fn_name});
+        self.fullscreen = false;
+        return;
+    };
+
+    if (self.fullscreen) {
+        zglfw.getWindowPos(self.window, &self.pos_x, &self.pos_y);
+        zglfw.getWindowSize(self.window, &self.width, &self.height);
+        const mode = try zglfw.getVideoMode(monitor);
+        self.refresh_rate = mode.refresh_rate;
+        zglfw.setWindowMonitor(self.window, monitor, self.pos_x, self.pos_y, mode.width, mode.height, mode.refresh_rate);
+        return;
+    }
+
+    zglfw.setWindowMonitor(self.window, null, self.pos_x, self.pos_y, self.width, self.height, self.refresh_rate);
 }
